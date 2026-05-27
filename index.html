@@ -271,7 +271,7 @@
 
     .section-eyebrow {
       padding: 0 32px 32px;
-      font-size: 13px;
+      font-size: 15px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--w40);
@@ -331,17 +331,17 @@
     }
 
     .project-title {
-      font-size: 20px; font-weight: 700;
+      font-size: 26px; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase;
       line-height: 1.1;
     }
     .project-meta-label {
-      font-size: 9px; letter-spacing: 0.2em;
+      font-size: 10px; letter-spacing: 0.2em;
       text-transform: uppercase; color: var(--w40);
       margin-bottom: 7px;
     }
     .project-meta-value {
-      font-size: 11px; letter-spacing: 0.12em;
+      font-size: 12px; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--w60);
     }
 
@@ -522,24 +522,115 @@
     .modal-close:hover { opacity: 1; }
     .modal-close svg { display: block; flex-shrink: 0; }
 
+    /* ─── Hamburger button (hidden on desktop) ──────── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      z-index: 600;
+      position: relative;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: white;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ─── Mobile full-screen menu ────────────────────── */
+    .nav-mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 450;
+      background: rgba(0,0,0,0.97);
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 32px 64px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .nav-mobile-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .nav-mobile-link {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: white;
+      opacity: 0.55;
+      cursor: pointer;
+      padding: 14px 0;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: none;
+      font-family: inherit;
+      text-align: left;
+      width: 100%;
+      display: block;
+      transition: opacity 0.15s ease;
+    }
+    .nav-mobile-link:active { opacity: 1; }
+    .nav-mobile-socials {
+      display: flex;
+      gap: 28px;
+      margin-top: 40px;
+    }
+    .nav-mobile-social {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+    }
+
     /* ─── Responsive ─────────────────────────────────── */
     @media (max-width: 700px) {
-      nav { padding: 20px; }
-      .nav-right { gap: 24px; }
-      .nav-divider { display: none; }
+      nav { padding: 20px 24px; }
+      .nav-right { display: none; }
+      .nav-hamburger { display: flex; }
+      .nav-mobile-menu { display: flex; }
+
       .hero-content { bottom: 44px; left: 20px; right: 20px; }
-      .hero-roles { gap: 32px; }
-      .scroll-hint { right: 20px; }
-      .section-eyebrow { padding: 0 20px 28px; }
-      .project-row { grid-template-columns: 1fr; gap: 20px; padding: 28px 20px; }
-      .project-item { height: 200px; }
-      .project-play { left: 20px; }
-      .project-yt-link { right: 20px; }
-      .about-inner { flex-direction: column; gap: 32px; padding: 32px 20px 60px; }
-      .about-photo { width: 100%; max-width: 280px; }
-      .contact-item { padding: 24px 20px; }
+      .hero-roles { gap: 24px; flex-wrap: wrap; }
+      .hero-role { font-size: 12px; }
+      .scroll-hint { display: none; }
+
+      .content-section { padding-top: 60px; }
+      .section-eyebrow { padding: 0 20px 24px; font-size: 12px; }
+
+      .project-item { height: 240px; }
+      .project-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 24px 20px;
+      }
+      .project-title { font-size: 20px; }
+      .project-play { left: 20px; bottom: 20px; }
+
+      #about { padding-top: 60px; }
+      .about-inner { flex-direction: column; gap: 28px; padding: 32px 20px 60px; }
+      .about-photo { width: 100%; max-width: 260px; }
+      .about-bio { font-size: 15px; }
+
+      #contact { padding-top: 60px; }
+      .contact-item { padding: 22px 20px; }
+      .contact-label { font-size: clamp(22px, 6vw, 36px); }
+
       .modal-inner { width: 95vw; }
-      .modal-close { top: -36px; }
+      .modal-close { top: 16px; right: 16px; }
     }
   </style>
 </head>
@@ -548,6 +639,9 @@
 <!-- ─ Nav ─────────────────────────────────────────── -->
 <nav>
   <div class="nav-logo" id="navLogo">OIC</div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
   <div class="nav-right">
 
     <div class="nav-col">
@@ -573,6 +667,20 @@
 
   </div>
 </nav>
+
+<!-- ─ Mobile menu ────────────────────────────────── -->
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <button class="nav-mobile-link" data-section="films">Films</button>
+  <button class="nav-mobile-link" data-section="documentaries">Documentaries</button>
+  <button class="nav-mobile-link" data-section="vlogs">Vlogs</button>
+  <button class="nav-mobile-link" data-section="about">About</button>
+  <button class="nav-mobile-link" data-section="contact">Contact</button>
+  <div class="nav-mobile-socials">
+    <a class="nav-mobile-social" href="https://instagram.com/or3nismael" target="_blank" rel="noopener">Instagram</a>
+    <a class="nav-mobile-social" href="https://tiktok.com/@orenismael"   target="_blank" rel="noopener">TikTok</a>
+    <a class="nav-mobile-social" href="https://youtube.com/@orenismael"  target="_blank" rel="noopener">YouTube</a>
+  </div>
+</div>
 
 <!-- ─ HERO ───────────────────────────────────────── -->
 <section id="home">
@@ -920,6 +1028,26 @@
   ['films','commercials','documentaries','vlogs','about','contact'].forEach(id => {
     const el = document.getElementById(id);
     if (el) io.observe(el);
+  });
+
+  /* ── Mobile hamburger menu ──────────────────────── */
+  const hamburger   = document.getElementById('navHamburger');
+  const mobileMenu  = document.getElementById('navMobileMenu');
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+
+  document.querySelectorAll('.nav-mobile-link').forEach(btn => {
+    btn.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      hamburger.classList.remove('open');
+      document.body.style.overflow = '';
+      const el = document.getElementById(btn.dataset.section);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
   });
 
   /* ── Hero video fade-in ──────────────────────────── */
