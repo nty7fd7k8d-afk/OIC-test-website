@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oren Cramton</title>
+  <style>
+    /* ─── Reset & Base ────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:   #000000;
+      --white:#ffffff;
+      --w60:  rgba(255,255,255,0.60);
+      --w40:  rgba(255,255,255,0.40);
+      --w20:  rgba(255,255,255,0.20);
+      --w10:  rgba(255,255,255,0.10);
+      --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { background: none; border: none; cursor: pointer; font-family: inherit; color: inherit; }
+
+    /* Site-wide film grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9000;
+      background-image: url('https://framerusercontent.com/images/g0QcWrxr87K0ufOxIUFBakwYA8.png');
+      background-size: 200px 200px;
+      background-repeat: repeat;
+      opacity: 0.09;
+      mix-blend-mode: overlay;
+    }
+
+    /* ─── Navigation ─────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 28px 32px;
+      pointer-events: none;
+    }
+    nav * { pointer-events: auto; }
+
+    .nav-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .nav-right  { display: flex; gap: 48px; align-items: flex-start; }
+    .nav-col    { display: flex; flex-direction: column; gap: 8px; }
+
+    .nav-divider {
+      width: 1px;
+      height: 52px;
+      background: var(--w10);
+      flex-shrink: 0;
+    }
+
+    .nav-link {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: 0.55;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      line-height: 1;
+      display: block;
+      text-align: left;
+    }
+    .nav-link:hover  { opacity: 1; }
+    .nav-link.active { opacity: 1; }
+
+    /* ─── HERO ──────────────────────────────────────── */
+    #home {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      cursor: pointer; /* whole hero is clickable */
+    }
+
+    .video-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+    .hero-video.ready { opacity: 1; }
+
+    /* Grain on hero */
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: url('https://framerusercontent.com/images/g0QcWrxr87K0ufOxIUFBakwYA8.png');
+      background-size: 240px 240px;
+      background-repeat: repeat;
+      opacity: 0.50;
+      mix-blend-mode: overlay;
+    }
+
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.40) 0%,
+        rgba(0,0,0,0.00) 22%,
+        rgba(0,0,0,0.00) 55%,
+        rgba(0,0,0,0.35) 78%,
+        rgba(0,0,0,0.55) 100%
+      );
+    }
+
+    .hero-content {
+      position: absolute;
+      z-index: 3;
+      bottom: 56px;
+      left: 32px;
+      right: 32px;
+      mix-blend-mode: difference;
+    }
+
+    .hero-name {
+      font-size: clamp(72px, 13.5vw, 180px);
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 0.88;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      color: #ffffff;
+    }
+
+    .hero-roles { display: flex; gap: 80px; align-items: center; }
+
+    .hero-role {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ffffff;
+      opacity: 0.65;
+    }
+
+    /* Subtle "click to play" hint in hero */
+    .hero-play-hint {
+      position: absolute;
+      z-index: 3;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    #home:hover .hero-play-hint { opacity: 1; }
+
+    .hero-play-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .hero-play-circle svg {
+      width: 20px; height: 20px;
+      fill: white;
+      margin-left: 3px; /* optical centering of play triangle */
+    }
+    .hero-play-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: white;
+      opacity: 0.7;
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      z-index: 3;
+      bottom: 48px;
+      right: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .scroll-hint span {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 52px;
+      background: white;
+      transform-origin: top;
+      animation: scrollPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { transform: scaleY(1);   opacity: 0.4; }
+      50%       { transform: scaleY(0.5); opacity: 1;   }
+    }
+
+    /* ─── Content Sections ───────────────────────────── */
+    .content-section {
+      padding-top: 80px;
+      background: var(--bg);
+    }
+
+    /* Film grain overlay inside each project card */
+    .project-grain {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: url('https://framerusercontent.com/images/g0QcWrxr87K0ufOxIUFBakwYA8.png');
+      background-size: 240px 240px;
+      background-repeat: repeat;
+      opacity: 0.45;
+      mix-blend-mode: overlay;
+    }
+
+    .section-eyebrow {
+      padding: 0 32px 32px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--w40);
+      font-weight: 400;
+    }
+
+    .project-list { list-style: none; border-top: 1px solid var(--w10); }
+
+    .project-item {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--w10);
+      cursor: pointer;
+      height: 220px;
+      transition: height 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    /* Background layer — gradient fallback + optional bg video */
+    .project-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transform: scale(1.04);
+      transition: opacity 0.6s ease, transform 8s ease;
+      overflow: hidden;
+    }
+    /* Non-video cards: bg + scrim appear on hover only */
+    .project-item:hover .project-bg,
+    .project-item.open  .project-bg { opacity: 1; transform: scale(1); }
+
+    /* Video cards: bg and scrim always visible, video plays all the time */
+    .project-item.has-video .project-bg  { opacity: 1; transform: scale(1); }
+    .project-item.has-video .project-scrim { opacity: 1; }
+
+    .project-bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .project-scrim {
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.10) 100%);
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .project-item:hover .project-scrim,
+    .project-item.open  .project-scrim { opacity: 1; }
+
+    .project-row {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 160px 200px;
+      gap: 16px;
+      align-items: start;
+      padding: 36px 32px;
+    }
+
+    .project-title {
+      font-size: 20px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .project-meta-label {
+      font-size: 9px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--w40);
+      margin-bottom: 7px;
+    }
+    .project-meta-value {
+      font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--w60);
+    }
+
+    /* Play button that appears on hover for video cards */
+    .project-play {
+      position: absolute;
+      z-index: 3;
+      bottom: 28px;
+      left: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+    }
+    .project-item:hover .project-play,
+    .project-item.open  .project-play { opacity: 1; transform: translateY(0); }
+
+    .project-play-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.5);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .project-play-icon svg {
+      width: 10px; height: 10px;
+      fill: white;
+      margin-left: 2px;
+    }
+
+    /* External link badge for cards with YouTube links */
+    .project-yt-link {
+      position: absolute;
+      z-index: 3;
+      bottom: 28px;
+      right: 32px;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--w40);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .project-item:hover .project-yt-link,
+    .project-item.open  .project-yt-link { opacity: 1; transform: translateY(0); }
+    .project-yt-link:hover { color: var(--white); }
+
+    /* ─── ABOUT ──────────────────────────────────────── */
+    #about { padding-top: 80px; background: var(--bg); }
+
+    .about-inner {
+      display: flex;
+      gap: 64px;
+      align-items: flex-start;
+      padding: 60px 32px 100px;
+    }
+
+    .about-photo {
+      width: 300px;
+      flex-shrink: 0;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .about-bio {
+      font-size: 17px;
+      line-height: 1.75;
+      letter-spacing: 0.02em;
+      color: var(--w60);
+      max-width: 560px;
+      padding-top: 8px;
+    }
+
+    /* ─── CONTACT ────────────────────────────────────── */
+    #contact { padding-top: 80px; background: var(--bg); }
+
+    .contact-list { border-top: 1px solid var(--w10); }
+
+    .contact-item {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--w10);
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      color: var(--white);
+    }
+    .contact-item:hover { opacity: 0.5; }
+
+    .contact-label {
+      font-size: clamp(26px, 5.5vw, 52px);
+      font-weight: 300; letter-spacing: -0.01em; line-height: 1;
+    }
+    .contact-arrow {
+      font-size: clamp(18px, 2.5vw, 28px);
+      transform: rotate(-45deg);
+      display: inline-block;
+      flex-shrink: 0;
+      opacity: 0.8;
+    }
+
+    /* ─── VIDEO MODAL ────────────────────────────────── */
+    .video-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .video-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.94);
+    }
+
+    .modal-inner {
+      position: relative;
+      z-index: 1;
+      width: 90vw;
+      max-width: 1100px;
+    }
+
+    .modal-video {
+      width: 100%;
+      height: auto;
+      max-height: 85vh;
+      display: block;
+      background: #000;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: white;
+      opacity: 0.5;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-close:hover { opacity: 1; }
+    .modal-close::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 1px;
+      background: white;
+      transform: rotate(45deg) translateX(4px);
+      position: relative;
+    }
+    .modal-close::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 12px;
+      height: 1px;
+      background: white;
+      transform: rotate(-45deg) translateX(4px);
+    }
+
+    /* ─── Responsive ─────────────────────────────────── */
+    @media (max-width: 700px) {
+      nav { padding: 20px; }
+      .nav-right { gap: 24px; }
+      .nav-divider { display: none; }
+      .hero-content { bottom: 44px; left: 20px; right: 20px; }
+      .hero-roles { gap: 32px; }
+      .scroll-hint { right: 20px; }
+      .section-eyebrow { padding: 0 20px 28px; }
+      .project-row { grid-template-columns: 1fr; gap: 20px; padding: 28px 20px; }
+      .project-item { height: 200px; }
+      .project-play { left: 20px; }
+      .project-yt-link { right: 20px; }
+      .about-inner { flex-direction: column; gap: 32px; padding: 32px 20px 60px; }
+      .about-photo { width: 100%; max-width: 280px; }
+      .contact-item { padding: 24px 20px; }
+      .modal-inner { width: 95vw; }
+      .modal-close { top: -36px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─ Nav ─────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo" id="navLogo">OIC</div>
+  <div class="nav-right">
+
+    <div class="nav-col">
+      <button class="nav-link" data-section="films">Films</button>
+      <button class="nav-link" data-section="documentaries">Documentaries</button>
+      <button class="nav-link" data-section="vlogs">Vlogs</button>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-col">
+      <button class="nav-link" data-section="about">About</button>
+      <button class="nav-link" data-section="contact">Contact</button>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-col">
+      <a class="nav-link" href="https://instagram.com/or3nismael" target="_blank" rel="noopener">Instagram</a>
+      <a class="nav-link" href="https://tiktok.com/@orenismael"   target="_blank" rel="noopener">TikTok</a>
+      <a class="nav-link" href="https://youtube.com/@orenismael"  target="_blank" rel="noopener">YouTube</a>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ─ HERO ───────────────────────────────────────── -->
+<section id="home">
+
+  <div class="video-bg">
+    <video class="hero-video" id="heroBgVideo" autoplay muted loop playsinline>
+      <source src="/Volumes/A009/website/guitar in a room.mov" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="hero-grain"></div>
+  <div class="hero-vignette"></div>
+
+  <!-- Play hint fades in on hover -->
+  <div class="hero-play-hint" aria-hidden="true">
+    <div class="hero-play-circle">
+      <svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg>
+    </div>
+    <span class="hero-play-label">Play</span>
+  </div>
+
+  <div class="hero-content">
+    <h1 class="hero-name">OREN<br>CRAMTON</h1>
+    <div class="hero-roles">
+      <span class="hero-role">Director</span>
+      <span class="hero-role">Cinematographer</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+
+</section>
+
+<!-- ─ FILMS ──────────────────────────────────────── -->
+<section id="films" class="content-section">
+  <p class="section-eyebrow">Films</p>
+  <ul class="project-list" id="filmsList"></ul>
+</section>
+
+<!-- ─ DOCUMENTARIES ──────────────────────────────── -->
+<section id="documentaries" class="content-section">
+  <p class="section-eyebrow">Documentaries</p>
+  <ul class="project-list" id="documentariesList"></ul>
+</section>
+
+<!-- ─ VLOGS ─────────────────────────────────────── -->
+<section id="vlogs" class="content-section">
+  <p class="section-eyebrow">Vlogs</p>
+  <ul class="project-list" id="vlogsList"></ul>
+</section>
+
+<!-- ─ ABOUT ──────────────────────────────────────── -->
+<section id="about">
+  <div class="about-inner">
+    <img class="about-photo" src="brand_assets/Me.jpeg" alt="Oren Cramton">
+    <p class="about-bio">
+      I am a filmmaker based in San Diego, California with an emphasis on
+      storytelling through short films, commercials and documentaries.
+      I am eager and willing to put the work in for any project put in front of me.
+      If you need affordable, high-quality cinematography,
+      I can guarantee my work is right for you.
+    </p>
+  </div>
+</section>
+
+<!-- ─ CONTACT ────────────────────────────────────── -->
+<section id="contact">
+  <div class="contact-list">
+    <a class="contact-item" href="mailto:orenismael@gmail.com">
+      <span class="contact-label">orenismael@gmail.com</span>
+      <span class="contact-arrow">↗</span>
+    </a>
+    <a class="contact-item" href="https://instagram.com/or3nismael" target="_blank" rel="noopener">
+      <span class="contact-label">Instagram</span>
+      <span class="contact-arrow">↗</span>
+    </a>
+    <a class="contact-item" href="https://tiktok.com/@orenismael" target="_blank" rel="noopener">
+      <span class="contact-label">TikTok</span>
+      <span class="contact-arrow">↗</span>
+    </a>
+    <a class="contact-item" href="https://youtube.com/@orenismael" target="_blank" rel="noopener">
+      <span class="contact-label">YouTube</span>
+      <span class="contact-arrow">↗</span>
+    </a>
+  </div>
+</section>
+
+<!-- ─ Video Modal ────────────────────────────────── -->
+<div id="videoModal" class="video-modal" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal-inner">
+    <button class="modal-close" id="modalClose">Close</button>
+    <video class="modal-video" id="modalVideo" controls playsinline></video>
+  </div>
+</div>
+
+<!-- ─ Scripts ─────────────────────────────────────── -->
+<script>
+
+  /* ── Video modal ─────────────────────────────────── */
+  const modal      = document.getElementById('videoModal');
+  const modalVideo = document.getElementById('modalVideo');
+
+  function openModal(src) {
+    modalVideo.src = src;
+    modalVideo.load();
+    modalVideo.play().catch(() => {});  /* autoplay may need gesture on mobile */
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modalVideo.pause();
+    modalVideo.src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalBackdrop').addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* ── Project data ────────────────────────────────── */
+  const catalogue = {
+    films: [
+      {
+        title:    "Austin's Finest Athletes | Born to Run Track Club",
+        role:     'Director',
+        category: 'Short Film',
+        bg:       'linear-gradient(140deg,#0d1117 0%,#1a2635 100%)',
+        video:    '/Volumes/A009/website/Born to run (Oren\'s version).mov',
+      },
+      {
+        title:    'Prime Spec Commercial',
+        role:     'Director / DP',
+        category: 'Commercial',
+        bg:       'linear-gradient(140deg,#100c0c 0%,#201310 100%)',
+        video:    '/Volumes/mac drive/tik toks/winter 2023:2024/prime commercial final 2.mp4',
+      },
+      {
+        title:    'Running on Clouds — Nike Spec Commercial',
+        role:     'Director / DP',
+        category: 'Commercial',
+        bg:       'linear-gradient(140deg,#0a100d 0%,#101e16 100%)',
+        video:    '/Volumes/mac drive/finished/running on clouds.mov',
+      },
+      {
+        title:    'Day in the Life of a BMW i3',
+        role:     'Director / DP',
+        category: 'Commercial',
+        bg:       'linear-gradient(140deg,#080c12 0%,#101826 100%)',
+        video:    '/Volumes/mac drive/finished/i3 vid.mov',
+      },
+      {
+        title:    'How to Destroy Your Videogame Addiction',
+        role:     'Director / DP',
+        category: 'Short Film',
+        bg:       'linear-gradient(140deg,#0d0c10 0%,#1a1820 100%)',
+        video:    '/Volumes/mac drive/finished/Tick Tok.mov',
+      },
+      {
+        title:    'Chillin in the Dunes with Black Magic',
+        role:     'Director / DP',
+        category: 'Short Film',
+        bg:       'linear-gradient(140deg,#100e08 0%,#201c10 100%)',
+        video:    '/Volumes/mac drive/tik toks/fall 2023/The Dunes wide.mp4',
+      },
+    ],
+    documentaries: [
+      {
+        title:    'IRAN DOC',
+        role:     'Director / DP',
+        category: 'Documentary',
+        bg:       'linear-gradient(140deg,#080c10 0%,#0f1620 100%)',
+        video:    '/Volumes/A009/website/IRAN DOC.mov',
+      },
+      {
+        title:    '3 Days at a Professional Foosball Tournament',
+        role:     'Director / DP',
+        category: 'Documentary',
+        bg:       'linear-gradient(140deg,#0a0810 0%,#12101e 100%)',
+        video:    '/Volumes/A009/website/FOOS DOC ACTUAL FINALLLL.mov',
+      },
+      {
+        title:    '16 Year Old Fooser Tackles Biggest Tournament in the US',
+        role:     'Director / DP',
+        category: 'Documentary',
+        bg:       'linear-gradient(140deg,#06080e 0%,#0c1018 100%)',
+        video:    '/Volumes/mac drive/finished/Foos 1/1st foos doc Final .mov',
+      },
+    ],
+    vlogs: [
+      {
+        title:    "A Jerry's First Day on the Slopes",
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#0a0e14 0%,#121e2c 100%)',
+        video:    '/Volumes/A009/website/a jerrys day on the slopes.mov',
+      },
+      {
+        title:    'California Taught me how to Live',
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#0e0a08 0%,#1e1410 100%)',
+        video:    '/Volumes/A009/website/california taught me how to live 2.MOV',
+      },
+      {
+        title:    'Euro Trip 5',
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#0a0d10 0%,#101822 100%)',
+        video:    '/Volumes/A009/SUM 2025 EURO trip/finished/final vlog.mov',
+      },
+      {
+        title:    'Euro Trip 4',
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#0d0a10 0%,#1a1028 100%)',
+        video:    '/Volumes/A009/SUM 2025 EURO trip/finished/ITALY AND BARCA.mov',
+      },
+      {
+        title:    'Euro Trip 3',
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#100d08 0%,#201a10 100%)',
+        video:    '/Volumes/A009/SUM 2025 EURO trip/finished/euro trip 3.mov',
+      },
+      {
+        title:    'Euro Trip 2',
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#080d0a 0%,#101e14 100%)',
+        video:    '/Volumes/A009/SUM 2025 EURO trip/finished/euro vlog 2 final.mov',
+      },
+      {
+        title:    'Euro Trip 1',
+        role:     'Director / DP',
+        category: 'Vlog',
+        bg:       'linear-gradient(140deg,#0d0808 0%,#1e1010 100%)',
+        video:    '/Volumes/A009/SUM 2025 EURO trip/finished/vlog 1 final.mov',
+      },
+    ],
+  };
+
+  /* ── Build project lists ─────────────────────────── */
+  const PLAY_ICON = `<svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg>`;
+
+  function buildList(projects, listId) {
+    const ul = document.getElementById(listId);
+    if (!ul) return;
+
+    projects.forEach(p => {
+      const li = document.createElement('li');
+      li.className = 'project-item' + (p.video ? ' has-video' : '');
+
+      const bgVideoHTML = p.video
+        ? `<video class="project-bg-video" autoplay muted loop playsinline>
+             <source src="${p.video}" type="video/mp4">
+           </video>`
+        : '';
+
+      const playHTML = p.video
+        ? `<div class="project-play">
+             <div class="project-play-icon">${PLAY_ICON}</div>
+             <span>Play</span>
+           </div>`
+        : '';
+
+      li.innerHTML = `
+        <div class="project-bg" style="background:${p.bg}">${bgVideoHTML}</div>
+        <div class="project-scrim"></div>
+        <div class="project-grain"></div>
+        <div class="project-row">
+          <div class="project-title">${p.title}</div>
+          <div>
+            <div class="project-meta-label">Role</div>
+            <div class="project-meta-value">${p.role}</div>
+          </div>
+          <div>
+            <div class="project-meta-label">Category</div>
+            <div class="project-meta-value">${p.category}</div>
+          </div>
+        </div>
+        ${playHTML}
+      `;
+
+      li.addEventListener('click', () => {
+        if (p.video) {
+          openModal(p.video);
+        } else {
+          const wasOpen = li.classList.contains('open');
+          document.querySelectorAll('.project-item.open').forEach(el => el.classList.remove('open'));
+          if (!wasOpen) li.classList.add('open');
+        }
+      });
+
+      ul.appendChild(li);
+    });
+  }
+
+  buildList(catalogue.films,         'filmsList');
+  buildList(catalogue.documentaries, 'documentariesList');
+  buildList(catalogue.vlogs,         'vlogsList');
+
+  /* ── Hero — click anywhere to play guitar in a room ─ */
+  document.getElementById('home').addEventListener('click', e => {
+    /* Ignore clicks that originated on nav (fixed, z:500 — above hero) */
+    if (e.target.closest('nav')) return;
+    openModal('/Volumes/A009/website/guitar in a room.mov');
+  });
+
+  /* ── Navigation — smooth scroll ──────────────────── */
+  document.querySelectorAll('.nav-link[data-section]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(btn.dataset.section)
+              .scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  document.getElementById('navLogo').addEventListener('click', () => {
+    document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  /* IntersectionObserver — highlight active section in nav */
+  const navBtns = document.querySelectorAll('.nav-link[data-section]');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navBtns.forEach(b => b.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[data-section="${entry.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  ['films','commercials','documentaries','vlogs','about','contact'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+
+  /* ── Hero video fade-in ──────────────────────────── */
+  (function () {
+    const vid = document.getElementById('heroBgVideo');
+    if (!vid) return;
+    vid.addEventListener('canplay', function handler() {
+      vid.classList.add('ready');
+      vid.removeEventListener('canplay', handler);
+    });
+    if (vid.readyState >= 3) vid.classList.add('ready');
+  })();
+
+</script>
+</body>
+</html>

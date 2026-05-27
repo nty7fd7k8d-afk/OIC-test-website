@@ -1,0 +1,7 @@
+CLAUDE.md
+*.code-workspace
+Screenshot*.png
+untitled folder/
+.env
+.tmp/
+.DS_Store
