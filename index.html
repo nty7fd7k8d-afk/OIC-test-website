@@ -722,42 +722,42 @@
         title:    "Austin's Finest Athletes | Born to Run Track Club",
         role:     'Director',
         category: 'Short Film',
-        bg:       'linear-gradient(140deg,#0d1117 0%,#1a2635 100%)',
+        preview:  'brand_assets/previews/born-to-run.mp4',
         youtube:  '0snuYMJuXWo',
       },
       {
         title:    'Prime Spec Commercial',
         role:     'Director / DP',
         category: 'Commercial',
-        bg:       'linear-gradient(140deg,#100c0c 0%,#201310 100%)',
+        preview:  'brand_assets/previews/prime-commercial.mp4',
         youtube:  'VrQenZxwWXg',
       },
       {
         title:    'Running on Clouds — Nike Spec Commercial',
         role:     'Director / DP',
         category: 'Commercial',
-        bg:       'linear-gradient(140deg,#0a100d 0%,#101e16 100%)',
+        preview:  'brand_assets/previews/running-on-clouds.mp4',
         youtube:  'cPJbSwyIhzg',
       },
       {
         title:    'Day in the Life of a BMW i3',
         role:     'Director / DP',
         category: 'Commercial',
-        bg:       'linear-gradient(140deg,#080c12 0%,#101826 100%)',
+        preview:  'brand_assets/previews/i3.mp4',
         youtube:  'qudKkt_bZrI',
       },
       {
         title:    'How to Destroy Your Videogame Addiction',
         role:     'Director / DP',
         category: 'Short Film',
-        bg:       'linear-gradient(140deg,#0d0c10 0%,#1a1820 100%)',
+        preview:  'brand_assets/previews/videogame-addiction.mp4',
         youtube:  'Ft2h_1M0ncc',
       },
       {
         title:    'Chillin in the Dunes with Black Magic',
         role:     'Director / DP',
         category: 'Short Film',
-        bg:       'linear-gradient(140deg,#100e08 0%,#201c10 100%)',
+        preview:  'brand_assets/previews/dunes.mp4',
         youtube:  '9Hel3OO8Nkw',
       },
     ],
@@ -766,21 +766,21 @@
         title:    'IRAN DOC',
         role:     'Director / DP',
         category: 'Documentary',
-        bg:       'linear-gradient(140deg,#080c10 0%,#0f1620 100%)',
+        preview:  'brand_assets/previews/iran-doc.mp4',
         youtube:  'UbTwEoxD08Y',
       },
       {
         title:    '3 Days at a Professional Foosball Tournament',
         role:     'Director / DP',
         category: 'Documentary',
-        bg:       'linear-gradient(140deg,#0a0810 0%,#12101e 100%)',
+        preview:  'brand_assets/previews/foos-doc.mp4',
         youtube:  'oXzuH0vOM6k',
       },
       {
         title:    '16 Year Old Fooser Tackles Biggest Tournament in the US',
         role:     'Director / DP',
         category: 'Documentary',
-        bg:       'linear-gradient(140deg,#06080e 0%,#0c1018 100%)',
+        preview:  'brand_assets/previews/foos-1.mp4',
         youtube:  'YTRnpTHKH8c',
       },
     ],
@@ -789,49 +789,49 @@
         title:    "A Jerry's First Day on the Slopes",
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#0a0e14 0%,#121e2c 100%)',
+        preview:  'brand_assets/previews/ski.mp4',
         youtube:  'Uw9VuzLUUa4',
       },
       {
         title:    'California Taught me how to Live',
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#0e0a08 0%,#1e1410 100%)',
+        preview:  'brand_assets/previews/california.mp4',
         youtube:  'Slh1LbQKQ0w',
       },
       {
         title:    'Euro Trip 5',
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#0a0d10 0%,#101822 100%)',
+        preview:  'brand_assets/previews/euro-5.mp4',
         youtube:  'P-s8EaxTetw',
       },
       {
         title:    'Euro Trip 4',
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#0d0a10 0%,#1a1028 100%)',
+        preview:  'brand_assets/previews/euro-4.mp4',
         youtube:  'VXPcYK4OVzs',
       },
       {
         title:    'Euro Trip 3',
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#100d08 0%,#201a10 100%)',
+        preview:  'brand_assets/previews/euro-3.mp4',
         youtube:  'ev_clmCYg80',
       },
       {
         title:    'Euro Trip 2',
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#080d0a 0%,#101e14 100%)',
+        preview:  'brand_assets/previews/euro-2.mp4',
         youtube:  'n2Wj2qVUuxg',
       },
       {
         title:    'Euro Trip 1',
         role:     'Director / DP',
         category: 'Vlog',
-        bg:       'linear-gradient(140deg,#0d0808 0%,#1e1010 100%)',
+        preview:  'brand_assets/previews/euro-1.mp4',
         youtube:  'ORLKcNHU-ak',
       },
     ],
@@ -855,12 +855,14 @@
            </div>`
         : '';
 
-      const bgStyle = p.youtube
-        ? `background-color:#111;background-image:url('https://img.youtube.com/vi/${p.youtube}/maxresdefault.jpg')`
-        : `background:${p.bg}`;
+      const bgVideoHTML = p.preview
+        ? `<video class="project-bg-video" autoplay muted loop playsinline>
+             <source src="${p.preview}" type="video/mp4">
+           </video>`
+        : '';
 
       li.innerHTML = `
-        <div class="project-bg" style="${bgStyle}"></div>
+        <div class="project-bg" style="background:#111">${bgVideoHTML}</div>
         <div class="project-scrim"></div>
         <div class="project-grain"></div>
         <div class="project-row">
