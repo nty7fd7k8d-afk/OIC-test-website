@@ -594,8 +594,7 @@
 
   <div class="video-bg">
     <video class="hero-video" id="heroBgVideo" autoplay muted loop playsinline>
-      <!-- TODO: replace with hosted URL after uploading guitar in a room.mov -->
-      <source src="brand_assets/when my train pulls in.mov" type="video/mp4">
+      <source src="brand_assets/guitar in a room.mov" type="video/mp4">
     </video>
   </div>
 
@@ -856,8 +855,12 @@
            </div>`
         : '';
 
+      const bgStyle = p.youtube
+        ? `background-color:#111;background-image:url('https://img.youtube.com/vi/${p.youtube}/maxresdefault.jpg')`
+        : `background:${p.bg}`;
+
       li.innerHTML = `
-        <div class="project-bg" style="background:${p.bg}"></div>
+        <div class="project-bg" style="${bgStyle}"></div>
         <div class="project-scrim"></div>
         <div class="project-grain"></div>
         <div class="project-row">
