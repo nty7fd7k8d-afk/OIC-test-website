@@ -520,24 +520,7 @@
       z-index: 8001;
     }
     .modal-close:hover { opacity: 1; }
-    .modal-close::before {
-      content: '';
-      display: inline-block;
-      width: 12px;
-      height: 1px;
-      background: white;
-      transform: rotate(45deg) translateX(4px);
-      position: relative;
-    }
-    .modal-close::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      width: 12px;
-      height: 1px;
-      background: white;
-      transform: rotate(-45deg) translateX(4px);
-    }
+    .modal-close svg { display: block; flex-shrink: 0; }
 
     /* ─── Responsive ─────────────────────────────────── */
     @media (max-width: 700px) {
@@ -684,7 +667,13 @@
 <div id="videoModal" class="video-modal" role="dialog" aria-modal="true">
   <div class="modal-backdrop" id="modalBackdrop"></div>
   <div class="modal-inner">
-    <button class="modal-close" id="modalClose">Close</button>
+    <button class="modal-close" id="modalClose">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="1" y1="1" x2="13" y2="13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="13" y1="1" x2="1" y2="13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Close
+    </button>
     <div class="modal-video-wrap">
       <iframe id="modalIframe" class="modal-iframe"
         frameborder="0"
